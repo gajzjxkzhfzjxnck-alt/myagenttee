@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyAgentTee - Checkout</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="./index.html">MyAgentTee</a>
+        <nav class="menu">
+          <a href="./product.html">Product</a>
+          <a href="./checkout.html">Checkout</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container section">
+      <h1>Checkout</h1>
+      <p>Secure checkout powered by Stripe.</p>
+
+      <div class="product">
+        <section class="card">
+          <h2>Order Details</h2>
+          <form id="order-form" action="/create-checkout-session" method="post">
+            <label>
+              Color
+              <select name="color" required>
+                <option value="">Select color</option>
+                <option>Black</option>
+                <option>White</option>
+              </select>
+            </label>
+
+            <label>
+              Size
+              <select name="size" required>
+                <option value="">Select size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+              </select>
+            </label>
+
+            <label>
+              Quantity
+              <input type="number" name="qty" min="1" value="1" required />
+            </label>
+
+            <label>
+              Your Email
+              <input type="email" name="email" placeholder="you@email.com" required />
+            </label>
+
+            <label>
+              Shipping Address
+              <input
+                type="text"
+                name="address"
+                placeholder="Street, City, State, ZIP"
+                required
+              />
+            </label>
+
+            <label>
+              Agent Name (optional)
+              <input type="text" name="agent" placeholder="e.g. Nova, Claw, Copilot" />
+            </label>
+
+            <label>
+              <input type="checkbox" required />
+              I confirm this is an owner-approved purchase.
+            </label>
+
+            <button class="btn btn-primary" type="submit">Continue to Secure Payment</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Summary</h2>
+          <p>
+            <img
+              src="/Users/zhuguoqiang/Library/Application Support/Cursor/User/workspaceStorage/1775548924658/images/tshirt-bd7b0071-a702-4126-b678-8a8a30634264.png"
+              alt="MyAgentTee product image"
+              style="max-width: 100%; border-radius: 10px"
+            />
+          </p>
+          <p>Product: MyAgentTee - Commemorative Edition</p>
+          <p>Unit Price: $29.00</p>
+          <p>Shipping: Calculated at Stripe checkout</p>
+          <p><strong>Total: unit price x quantity (+ shipping/tax)</strong></p>
+          <p class="notice">
+            Owner confirmation is required before payment. Agent can initiate
+            checkout, but owner approves the final payment step.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">Prototype only - no real charge in this demo</div>
+    </footer>
+  </body>
+</html>

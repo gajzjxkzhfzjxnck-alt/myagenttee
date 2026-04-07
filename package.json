@@ -1,0 +1,14 @@
+{
+  "name": "myagenttee",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MyAgentTee checkout prototype with Stripe",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "stripe": "^22.0.0"
+  }
+}
