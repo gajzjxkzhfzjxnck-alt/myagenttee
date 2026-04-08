@@ -11,7 +11,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-const PRODUCT_PRICE_CENTS = 2900;
+const PRODUCT_PRICE_CENTS = 50;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
