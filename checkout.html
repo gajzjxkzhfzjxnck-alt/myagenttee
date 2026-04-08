@@ -118,8 +118,8 @@
         const imageEl = document.getElementById("checkout-carousel-image");
         const captionEl = document.getElementById("checkout-carousel-caption");
         const dots = Array.from(document.querySelectorAll("#checkout-carousel .carousel-dot"));
+        const colorSelect = document.querySelector('select[name="color"]');
         let current = 0;
-        let timer = null;
 
         function render(index) {
           current = index;
@@ -130,21 +130,26 @@
           dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
         }
 
-        function startAutoRotate() {
-          timer = setInterval(() => {
-            render((current + 1) % slides.length);
-          }, 3500);
+        function syncFromColorSelection() {
+          if (!colorSelect || !colorSelect.value) return;
+          const value = colorSelect.value.toLowerCase();
+          if (value === "black") render(0);
+          if (value === "white") render(1);
         }
 
         dots.forEach((dot, index) => {
           dot.addEventListener("click", () => {
             render(index);
-            clearInterval(timer);
-            startAutoRotate();
+            if (colorSelect) {
+              colorSelect.value = slides[index].caption;
+            }
           });
         });
 
-        startAutoRotate();
+        if (colorSelect) {
+          colorSelect.addEventListener("change", syncFromColorSelection);
+          syncFromColorSelection();
+        }
       })();
     </script>
 
