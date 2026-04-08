@@ -19,25 +19,21 @@
 
     <main class="container section">
       <div class="product">
-        <section class="mockup mockup-grid" aria-label="Product mockups">
-          <figure style="margin: 0">
-            <img
-              src="./assets/agent-tee-black.png?v=66badd0b"
-              alt="Black tee: friendly robot and text MY AI BOUGHT THIS. I'M JUST THE HARDWARE."
-            />
-            <figcaption style="margin-top: 8px; font-size: 13px; color: var(--muted)">
-              Black
-            </figcaption>
-          </figure>
-          <figure style="margin: 0">
-            <img
-              src="./assets/agent-tee-white.png?v=66badd0b"
-              alt="White tee: friendly robot and text MY AI BOUGHT THIS. I'M JUST THE HARDWARE."
-            />
-            <figcaption style="margin-top: 8px; font-size: 13px; color: var(--muted)">
-              White
-            </figcaption>
-          </figure>
+        <section class="mockup" aria-label="Product mockups">
+          <div class="carousel" id="product-carousel">
+            <div class="carousel-stage">
+              <img
+                id="product-carousel-image"
+                src="./assets/agent-tee-black.png"
+                alt="Black tee: friendly robot and text MY AI BOUGHT THIS. I'M JUST THE HARDWARE."
+              />
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-dot active" data-index="0" aria-label="Show black tee"></button>
+              <button class="carousel-dot" data-index="1" aria-label="Show white tee"></button>
+            </div>
+            <p class="carousel-caption" id="product-carousel-caption">Black</p>
+          </div>
         </section>
 
         <section class="card">
@@ -66,6 +62,54 @@
         </section>
       </div>
     </main>
+
+    <script>
+      (function setupProductCarousel() {
+        const slides = [
+          {
+            src: "./assets/agent-tee-black.png",
+            alt: "Black tee: friendly robot and text MY AI BOUGHT THIS. I'M JUST THE HARDWARE.",
+            caption: "Black"
+          },
+          {
+            src: "./assets/agent-tee-white.png",
+            alt: "White tee: friendly robot and text MY AI BOUGHT THIS. I'M JUST THE HARDWARE.",
+            caption: "White"
+          }
+        ];
+
+        const imageEl = document.getElementById("product-carousel-image");
+        const captionEl = document.getElementById("product-carousel-caption");
+        const dots = Array.from(document.querySelectorAll("#product-carousel .carousel-dot"));
+        let current = 0;
+        let timer = null;
+
+        function render(index) {
+          current = index;
+          const slide = slides[index];
+          imageEl.src = slide.src;
+          imageEl.alt = slide.alt;
+          captionEl.textContent = slide.caption;
+          dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+        }
+
+        function startAutoRotate() {
+          timer = setInterval(() => {
+            render((current + 1) % slides.length);
+          }, 3000);
+        }
+
+        dots.forEach((dot, index) => {
+          dot.addEventListener("click", () => {
+            render(index);
+            clearInterval(timer);
+            startAutoRotate();
+          });
+        });
+
+        startAutoRotate();
+      })();
+    </script>
 
     <footer class="footer">
       <div class="container footer-inner">

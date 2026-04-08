@@ -82,15 +82,19 @@
 
         <section class="card">
           <h2>Summary</h2>
-          <div class="mockup-grid" style="margin-bottom: 12px">
-            <img
-              src="./assets/agent-tee-black.png?v=66badd0b"
-              alt="Black tee mockup"
-            />
-            <img
-              src="./assets/agent-tee-white.png?v=66badd0b"
-              alt="White tee mockup"
-            />
+          <div class="carousel carousel--compact" id="checkout-carousel" style="margin-bottom: 12px">
+            <div class="carousel-stage">
+              <img
+                id="checkout-carousel-image"
+                src="./assets/agent-tee-black.png"
+                alt="Black tee mockup"
+              />
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-dot active" data-index="0" aria-label="Show black tee"></button>
+              <button class="carousel-dot" data-index="1" aria-label="Show white tee"></button>
+            </div>
+            <p class="carousel-caption" id="checkout-carousel-caption">Black</p>
           </div>
           <p>Product: MyAgentTee - Commemorative Edition</p>
           <p>Unit Price: $29.00</p>
@@ -103,6 +107,46 @@
         </section>
       </div>
     </main>
+
+    <script>
+      (function setupCheckoutCarousel() {
+        const slides = [
+          { src: "./assets/agent-tee-black.png", alt: "Black tee mockup", caption: "Black" },
+          { src: "./assets/agent-tee-white.png", alt: "White tee mockup", caption: "White" }
+        ];
+
+        const imageEl = document.getElementById("checkout-carousel-image");
+        const captionEl = document.getElementById("checkout-carousel-caption");
+        const dots = Array.from(document.querySelectorAll("#checkout-carousel .carousel-dot"));
+        let current = 0;
+        let timer = null;
+
+        function render(index) {
+          current = index;
+          const slide = slides[index];
+          imageEl.src = slide.src;
+          imageEl.alt = slide.alt;
+          captionEl.textContent = slide.caption;
+          dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+        }
+
+        function startAutoRotate() {
+          timer = setInterval(() => {
+            render((current + 1) % slides.length);
+          }, 3500);
+        }
+
+        dots.forEach((dot, index) => {
+          dot.addEventListener("click", () => {
+            render(index);
+            clearInterval(timer);
+            startAutoRotate();
+          });
+        });
+
+        startAutoRotate();
+      })();
+    </script>
 
     <footer class="footer">
       <div class="container footer-inner">

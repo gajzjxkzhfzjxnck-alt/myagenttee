@@ -154,6 +154,55 @@ a:hover {
   color: var(--muted);
 }
 
+.carousel {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.carousel-stage {
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+}
+
+.carousel-stage img {
+  width: 100%;
+  display: block;
+}
+
+.carousel-controls {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #111722;
+  cursor: pointer;
+}
+
+.carousel-dot.active {
+  background: var(--brand);
+}
+
+.carousel-caption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.carousel--compact {
+  max-width: 300px;
+}
+
 .price {
   font-size: 28px;
   margin: 0;
