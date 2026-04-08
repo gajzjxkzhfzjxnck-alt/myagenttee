@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyAgentTee - Orders</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="./index.html">MyAgentTee</a>
+        <nav class="menu">
+          <a href="./product.html">Product</a>
+          <a href="./checkout.html">Checkout</a>
+          <a href="./orders.html">Orders</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container section">
+      <section class="card">
+        <h1>Recent Orders</h1>
+        <p>This page is for early testing and internal review.</p>
+        <div id="orders-root" class="legal-doc">
+          <p>Loading orders...</p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function escapeHtml(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+
+      async function loadOrders() {
+        const root = document.getElementById("orders-root");
+        try {
+          const res = await fetch("/api/orders");
+          const data = await res.json();
+
+          if (!data.ok) {
+            root.innerHTML = "<p>Unable to load orders.</p>";
+            return;
+          }
+
+          if (!data.orders || data.orders.length === 0) {
+            root.innerHTML = "<p>No orders recorded yet.</p>";
+            return;
+          }
+
+          const rows = data.orders
+            .map(
+              (o) => `
+                <tr>
+                  <td>${escapeHtml(o.recorded_at)}</td>
+                  <td>${escapeHtml(o.email)}</td>
+                  <td>${escapeHtml(o.color)}</td>
+                  <td>${escapeHtml(o.size)}</td>
+                  <td>${escapeHtml(o.quantity)}</td>
+                  <td>${escapeHtml(o.currency)} ${escapeHtml(o.amount_total)}</td>
+                  <td>${escapeHtml(o.status)}</td>
+                </tr>
+              `
+            )
+            .join("");
+
+          root.innerHTML = `
+            <div style="overflow:auto;">
+              <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Recorded</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Email</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Color</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Size</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Qty</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Amount</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #30363d;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          `;
+        } catch (error) {
+          root.innerHTML = "<p>Network error while loading orders.</p>";
+        }
+      }
+
+      loadOrders();
+    </script>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <p class="footer-copy">MyAgentTee</p>
+        <nav class="footer-links" aria-label="Legal">
+          <a href="./terms.html">Terms</a>
+          <a href="./privacy.html">Privacy</a>
+          <a href="./refund.html">Refunds</a>
+        </nav>
+        <p class="footer-contact">
+          <a href="mailto:hello@myagenttee.com">hello@myagenttee.com</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

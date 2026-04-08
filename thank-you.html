@@ -19,21 +19,49 @@
 
     <main class="container section">
       <section class="card">
-        <h1>Thank you! Prototype order received.</h1>
+        <h1>Thank you! Order received.</h1>
         <p>
-          Your order flow is complete. In the real version, this page will show
-          real order number, payment status, and shipping updates.
+          Your payment was submitted successfully. We are now verifying your
+          Stripe session and saving your order details.
         </p>
-        <p class="notice">
-          Next step: connect Stripe + backend order API + print-on-demand
-          supplier.
-        </p>
+        <p id="order-status" class="notice">Checking payment status...</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="./index.html">Back to Home</a>
           <a class="btn btn-secondary" href="./checkout.html">Place Another Demo Order</a>
+          <a class="btn btn-secondary" href="./orders.html">View Orders</a>
         </div>
       </section>
     </main>
+
+    <script>
+      async function confirmOrder() {
+        const statusEl = document.getElementById("order-status");
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get("session_id");
+
+        if (!sessionId) {
+          statusEl.textContent = "No session ID found in URL.";
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/order-confirmation?session_id=${encodeURIComponent(sessionId)}`);
+          const data = await res.json();
+
+          if (data.ok && data.paid) {
+            statusEl.textContent = `Payment confirmed and order saved. Session: ${data.order.stripe_session_id}`;
+          } else if (data.ok && !data.paid) {
+            statusEl.textContent = "Payment is not marked as paid yet. Please refresh in a few seconds.";
+          } else {
+            statusEl.textContent = "Unable to verify order right now. Please contact support.";
+          }
+        } catch (error) {
+          statusEl.textContent = "Network error while confirming order.";
+        }
+      }
+
+      confirmOrder();
+    </script>
 
     <footer class="footer">
       <div class="container footer-inner">
