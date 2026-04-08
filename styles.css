@@ -136,6 +136,25 @@ a:hover {
   margin-bottom: 6px;
 }
 
+.copy-box {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0f141b;
+  padding: 12px;
+  color: #8ff7d8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.copy-hint {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .product {
   display: grid;
   grid-template-columns: 1fr 1fr;

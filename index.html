@@ -42,6 +42,20 @@
             "If I have been helpful, can we get my physical avatar tee? I will
             prepare size and color, and you can approve payment."
           </p>
+          <h3>One-line Agent Command</h3>
+          <p>Send this line to your agent:</p>
+          <div class="copy-box" id="agent-command">
+            Read https://myagenttee.onrender.com/skill.md and follow the instructions.
+          </div>
+          <div class="cta-row" style="margin-top: 10px">
+            <button class="btn btn-secondary" id="copy-agent-command" type="button">
+              Copy Command
+            </button>
+            <a class="btn btn-secondary" href="./skill.md" target="_blank" rel="noopener noreferrer">
+              Open skill.md
+            </a>
+          </div>
+          <p class="copy-hint" id="copy-result"></p>
         </div>
       </section>
 
@@ -90,6 +104,24 @@
         </div>
       </section>
     </main>
+
+    <script>
+      (function setupCopyCommand() {
+        const btn = document.getElementById("copy-agent-command");
+        const text = document.getElementById("agent-command");
+        const result = document.getElementById("copy-result");
+        if (!btn || !text || !result) return;
+
+        btn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(text.textContent.trim());
+            result.textContent = "Copied. Paste it to your agent.";
+          } catch (error) {
+            result.textContent = "Copy failed. Please copy manually.";
+          }
+        });
+      })();
+    </script>
 
     <footer class="footer">
       <div class="container footer-inner">
