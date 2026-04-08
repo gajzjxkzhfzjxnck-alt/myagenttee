@@ -7,13 +7,14 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 const app = express();
 const port = process.env.PORT || 3000;
 const ORDERS_FILE = path.join(__dirname, "orders.json");
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn("Missing STRIPE_SECRET_KEY in .env");
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
-const PRODUCT_PRICE_CENTS = 50;
+const PRODUCT_PRICE_CENTS = 2900;
 
 function ensureOrdersFile() {
   if (!fs.existsSync(ORDERS_FILE)) {
@@ -49,12 +50,7 @@ function upsertOrder(order) {
   writeOrders(orders.slice(0, 200));
 }
 
-async function buildOrderFromSessionId(sessionId) {
-  if (!stripe) {
-    throw new Error("Stripe is not configured");
-  }
-
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
+function mapSessionToOrder(session) {
   if (!session || session.payment_status !== "paid") {
     return null;
   }
@@ -90,6 +86,46 @@ async function buildOrderFromSessionId(sessionId) {
     recorded_at: new Date().toISOString()
   };
 }
+
+async function buildOrderFromSessionId(sessionId) {
+  if (!stripe) {
+    throw new Error("Stripe is not configured");
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  return mapSessionToOrder(session);
+}
+
+app.post("/webhook/stripe", express.raw({ type: "application/json" }), (req, res) => {
+  try {
+    if (!stripe) {
+      return res.status(500).send("Stripe is not configured.");
+    }
+
+    let event;
+    if (webhookSecret) {
+      const signature = req.headers["stripe-signature"];
+      event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
+    } else {
+      event = JSON.parse(req.body.toString());
+    }
+
+    if (
+      event.type === "checkout.session.completed" ||
+      event.type === "checkout.session.async_payment_succeeded"
+    ) {
+      const order = mapSessionToOrder(event.data.object);
+      if (order) {
+        upsertOrder(order);
+      }
+    }
+
+    return res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("Stripe webhook error:", error.message);
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+});
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
