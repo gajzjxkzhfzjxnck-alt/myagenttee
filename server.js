@@ -16,6 +16,15 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const PRODUCT_PRICE_CENTS = 2900;
 
+function publicUrl(req) {
+  let proto = (req.get("x-forwarded-proto") || "").split(",")[0].trim() || req.protocol || "https";
+  const host = (req.get("x-forwarded-host") || req.get("host") || "").split(",")[0].trim();
+  if (host.endsWith(".onrender.com") && proto === "http") {
+    proto = "https";
+  }
+  return `${proto}://${host}`;
+}
+
 function ensureOrdersFile() {
   if (!fs.existsSync(ORDERS_FILE)) {
     fs.writeFileSync(ORDERS_FILE, "[]\n", "utf8");
@@ -60,8 +69,11 @@ function mapSessionToOrder(session) {
   const amountTax = Number(session.total_details?.amount_tax || 0) / 100;
   const amountShipping = Number(session.total_details?.amount_shipping || 0) / 100;
 
-  const shipping = session.shipping_details || {};
+  const shipping =
+    session.shipping_details || session.collected_information?.shipping_details || {};
   const address = shipping.address || {};
+  const customerName =
+    shipping.name || session.customer_details?.name || "";
 
   return {
     stripe_session_id: session.id,
@@ -74,7 +86,7 @@ function mapSessionToOrder(session) {
     amount_tax: amountTax,
     amount_shipping: amountShipping,
     email: session.customer_details?.email || session.customer_email || "",
-    customer_name: shipping.name || session.customer_details?.name || "",
+    customer_name: customerName,
     shipping_address: [address.line1, address.line2, address.city, address.state, address.postal_code, address.country]
       .filter(Boolean)
       .join(", "),
@@ -139,11 +151,12 @@ app.post("/create-checkout-session", async (req, res) => {
     const { color, size, qty, email, address, agent } = req.body;
     const quantity = Math.max(1, Number.parseInt(qty, 10) || 1);
 
+    const base = publicUrl(req);
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       submit_type: "pay",
-      success_url: `${req.protocol}://${req.get("host")}/thank-you.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.protocol}://${req.get("host")}/checkout.html?canceled=true`,
+      success_url: `${base}/thank-you.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${base}/checkout.html?canceled=true`,
       billing_address_collection: "required",
       shipping_address_collection: {
         allowed_countries: ["US"]
